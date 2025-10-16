@@ -2,7 +2,9 @@ package com.example.docudeep.api;
 
 
 import com.example.docudeep.api.dto.*;
-import com.example.docudeep.service.*;
+import com.example.docudeep.service.ApplicationService;
+import com.example.docudeep.service.CaseService;
+import com.example.docudeep.service.DecisionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -15,7 +17,8 @@ import java.util.UUID;
 @RestController @RequestMapping("/api") @RequiredArgsConstructor
 public class ApiController {
     private final ApplicationService applicationService;
-    public final DecisionService decisionService;
+    private final DecisionService decisionService;
+    private final CaseService caseService;
 
 
     @PostMapping("/applications")
@@ -33,5 +36,15 @@ public class ApiController {
     @PostMapping("/decisions")
     public DecisionDTO decide(@RequestBody @Validated DecisionRequest req){
         return decisionService.decide(req);
+    }
+
+    @PostMapping("/cases")
+    public ResponseEntity<CaseCreateResponse> createCase(@RequestBody @Validated CaseCreateRequest request) {
+        return ResponseEntity.status(201).body(caseService.createCase(request));
+    }
+
+    @PostMapping("/cases/{caseId}/documents/{documentId}/complete")
+    public DocumentDTO completeUpload(@PathVariable UUID caseId, @PathVariable UUID documentId) {
+        return caseService.completeUpload(caseId, documentId);
     }
 }

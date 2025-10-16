@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocuDeep – Téléversement de justificatifs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="app-header">
+    <div class="brand">
+        <span class="brand-logo">📁</span>
+        <div>
+            <h1>DocuDeep</h1>
+            <p class="subtitle">Déposez vos justificatifs en toute sécurité</p>
+        </div>
+    </div>
+    <button id="reset-storage" class="ghost-button" type="button" title="Réinitialiser le stockage local">Réinitialiser</button>
+</header>
+<main class="shell">
+    <section class="card">
+        <div class="card-header">
+            <h2>Transférez vos documents</h2>
+            <p>Sélectionnez jusqu'à <strong>5 fichiers</strong> (PDF, PNG, JPG). Chaque fichier doit être associé à un type documentaire.</p>
+        </div>
+        <div id="dropzone" class="dropzone" role="button" tabindex="0">
+            <div class="dropzone-icon">⬆️</div>
+            <div class="dropzone-text">
+                <strong>Glissez-déposez vos fichiers ici</strong>
+                <span>ou cliquez pour parcourir vos documents</span>
+            </div>
+            <input id="file-input" type="file" accept="application/pdf,image/png,image/jpeg" multiple hidden>
+        </div>
+        <div id="files-empty" class="empty-state">
+            <p>Aucun document sélectionné pour le moment.</p>
+        </div>
+        <ul id="file-list" class="file-list" aria-live="polite"></ul>
+        <div class="actions">
+            <button id="submit" class="primary" type="button" disabled>Lancer l'envoi</button>
+        </div>
+    </section>
+    <aside class="card status-panel" aria-live="polite">
+        <h3>Suivi des opérations</h3>
+        <div id="status" class="status-log">
+            <p>Soyez prêt·e à confirmer vos dépôts. Un dossier est créé automatiquement à la validation.</p>
+        </div>
+    </aside>
+</main>
+<template id="file-row-template">
+    <li class="file-row">
+        <div class="file-meta">
+            <div class="file-name" title=""></div>
+            <span class="file-size"></span>
+        </div>
+        <div class="file-controls">
+            <label>
+                Type de document
+                <select class="file-type">
+                    <option value="" disabled selected>Choisir…</option>
+                    <option value="BULLETIN_DE_PAIE">Bulletin de paie</option>
+                    <option value="AVIS_D_IMPOSITION">Avis d'imposition</option>
+                    <option value="CHARGES">Charges</option>
+                </select>
+            </label>
+            <button type="button" class="ghost-button remove">Retirer</button>
+        </div>
+        <div class="file-status">
+            <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div class="progress-bar"></div>
+            </div>
+            <span class="status-text">En attente</span>
+        </div>
+    </li>
+</template>
+<script src="app.js" type="module"></script>
+</body>
+</html>
