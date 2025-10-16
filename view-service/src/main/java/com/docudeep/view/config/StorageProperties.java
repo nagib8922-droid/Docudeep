@@ -1,19 +1,29 @@
-package com.docudeep.view.config;
+package com.example.docudeep.config;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
+import software.amazon.awssdk.regions.Region;
 
-@ConfigurationProperties(prefix = "storage")
+import java.time.Duration;
+
+@ConfigurationProperties(prefix = "docudeep.storage")
+@Validated
+@Data
 public class StorageProperties {
 
     @NotBlank
-    private String root = "./storage/upload";
+    private String bucket;
 
-    public String getRoot() {
-        return root;
-    }
+    @NotBlank
+    private String region = Region.EU_WEST_3.id();
 
-    public void setRoot(String root) {
-        this.root = root;
+    @NotNull
+    private Duration presignTtl = Duration.ofMinutes(15);
+
+    public Region getRegion() {
+        return Region.of(region);
     }
 }
