@@ -1,63 +1,62 @@
-# DocuDeep – Microservices indépendants
+# DocuDeep – Architecture microservices
 
-Cette implémentation sépare DocuDeep en trois projets entièrement autonomes écrits avec la bibliothèque standard Python. Chaque microservice peut être démarré, testé et livré sans dépendances externes ni accès réseau.
+Cette version sépare DocuDeep en trois services indépendants :
 
-1. **frontend-service** – sert l'interface web moderne permettant d'uploader et de consulter les justificatifs.
-2. **upload-service** – API REST responsable de la création des dossiers, de la validation des fichiers et de leur stockage sécurisé sur disque.
-3. **view-service** – API REST qui liste les dossiers existants et offre le téléchargement des documents stockés.
+1. **frontend-service** – application web (port 8080) permettant d'uploader et de consulter les justificatifs.
+2. **upload-service** – API de création de dossiers et de stockage des documents (port 8081).
+3. **view-service** – API de consultation et de téléchargement des documents validés (port 8082).
 
-Les services partagent un répertoire `storage/` à la racine du dépôt. Vous pouvez modifier son emplacement en définissant la variable d'environnement `STORAGE_ROOT` (ou via l'option `--storage`).
+Tous les services partagent un stockage fichier local (`./storage/upload`) pour simplifier la recette en environnement de développement.
 
-## Lancer la plateforme
+## Pré-requis
 
-Ouvrez trois terminaux et exécutez les commandes suivantes :
+- Java 21
+- Gradle wrapper fourni (`./gradlew`)
+
+## Démarrage des services
+
+Dans trois terminaux distincts :
 
 ```bash
-# Terminal 1 – interface web (http://localhost:8000)
-cd frontend-service
-python app.py
+# Terminal 1 – interface web
+./gradlew :frontend-service:bootRun
 
-# Terminal 2 – service d'upload (http://localhost:8001)
-cd upload-service
-python -m docudeep_upload.server --storage ../storage
+# Terminal 2 – upload & stockage
+./gradlew :upload-service:bootRun
 
-# Terminal 3 – service de consultation (http://localhost:8002)
-cd view-service
-python -m docudeep_view.server --storage ../storage
+# Terminal 3 – consultation
+./gradlew :view-service:bootRun
 ```
 
-Une fois les trois services démarrés, ouvrez [http://localhost:8000](http://localhost:8000) pour accéder à la webview. L'écran supporte :
+Ensuite ouvrez [http://localhost:8080](http://localhost:8080) pour accéder à l'application web.
 
-- le téléversement de **1 à 5** documents (PDF, PNG, JPG/JPEG) de **10 Mo maximum** chacun ;
-- la sélection du type documentaire (*bulletin de paie*, *avis d'imposition*, *charges*) pour chaque fichier ;
-- l'affichage immédiat des dossiers enregistrés avec liens de téléchargement.
+## Parcours de recette
 
-Le service d'upload rejette automatiquement les fichiers trop volumineux, au mauvais format ou non lisibles (vérification d'en-tête PDF/PNG/JPEG). Un endpoint `POST /cases/reset` permet de nettoyer le stockage lors des recettes.
+1. Depuis l'écran web, ajoutez jusqu'à **5 fichiers** (PDF, PNG, JPG). Chaque fichier doit être associé à un type documentaire.
+2. Au clic sur « Lancer l'envoi », le frontend appelle l'API `upload-service` :
+   - création d'un dossier (`caseId`).
+   - génération d'URL d'upload direct (`PUT /storage/cases/{caseId}/documents/{documentId}`).
+   - validation côté serveur (taille ≤ 10 Mo, format supporté, fichier non vide).
+3. Le panneau latéral liste les dossiers disponibles en interrogeant `view-service` (`GET /cases`). Chaque document peut être téléchargé via `GET /cases/{caseId}/documents/{documentId}`.
+4. Pour repartir d'un stockage vierge, utilisez le bouton « Réinitialiser » qui appelle `POST /dev/storage/reset` sur `upload-service`.
+
+## Configuration
+
+Les trois services partagent la même propriété `storage.root` (par défaut `./storage/upload`). Vous pouvez la modifier via une variable d'environnement :
+
+```bash
+export STORAGE_ROOT=/chemin/vers/mon/repertoire
+./gradlew :upload-service:bootRun
+```
+
+Appliquez la même configuration aux trois services pour conserver un stockage cohérent.
 
 ## Tests automatisés
 
-Chaque microservice dispose de tests unitaires exécutables sans dépendances :
+Lancez toutes les suites :
 
 ```bash
-cd upload-service
-python -m unittest
-
-cd ../view-service
-python -m unittest
-
-cd ../frontend-service
-python -m unittest
+./gradlew test
 ```
 
-Tous les tests doivent réussir avant de valider une modification (`git commit`).
-
-## Nettoyage du stockage
-
-Le répertoire partagé peut être supprimé en toute sécurité pour repartir de zéro :
-
-```bash
-rm -rf storage/cases
-mkdir -p storage/cases
-```
-
-Veillez à utiliser le même dossier pour les services d'upload et de consultation afin de conserver la cohérence des dossiers.
+Les tests de chaque microservice se basent sur les contextes Spring Boot et ne nécessitent pas de dépendances externes.
