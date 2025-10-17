@@ -1,2 +1,0 @@
-rootProject.name = 'DocuDeep'
-include 'frontend-service', 'upload-service', 'view-service'
