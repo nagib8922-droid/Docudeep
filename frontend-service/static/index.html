@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DocuDeep — Téléversement des justificatifs</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <section class="card" id="upload-panel">
+        <header>
+          <h1>DocuDeep</h1>
+          <p>Envoyez jusqu'à cinq documents pour analyser votre solvabilité.</p>
+        </header>
+        <form id="upload-form">
+          <div id="dropzone" class="dropzone" tabindex="0">
+            <span>Glissez vos fichiers ici ou cliquez pour parcourir.</span>
+            <input id="file-input" type="file" accept=".pdf,.png,.jpg,.jpeg" multiple />
+          </div>
+          <div id="file-list"></div>
+          <button type="submit" class="primary">Téléverser</button>
+        </form>
+        <div id="messages" role="status" aria-live="polite"></div>
+      </section>
+      <section class="card" id="cases-panel">
+        <header>
+          <h2>Dossiers téléversés</h2>
+          <button id="refresh-cases" type="button" class="secondary">Actualiser</button>
+        </header>
+        <ul id="case-list" class="case-list"></ul>
+      </section>
+    </main>
+    <script src="app.js" type="module"></script>
+  </body>
+</html>
