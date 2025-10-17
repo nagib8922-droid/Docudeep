@@ -10,8 +10,8 @@ Tous les services partagent un stockage fichier local (`./storage/upload`) pour 
 
 ## Pré-requis
 
-- Java 21
-- Gradle wrapper fourni (`./gradlew`)
+- Java 21.0.8
+- Maven 3.9+ installé (`mvn`)
 
 ## Démarrage des services
 
@@ -19,13 +19,13 @@ Dans trois terminaux distincts :
 
 ```bash
 # Terminal 1 – interface web
-./gradlew :frontend-service:bootRun
+mvn -pl frontend-service spring-boot:run
 
 # Terminal 2 – upload & stockage
-./gradlew :upload-service:bootRun
+mvn -pl upload-service spring-boot:run
 
 # Terminal 3 – consultation
-./gradlew :view-service:bootRun
+mvn -pl view-service spring-boot:run
 ```
 
 Ensuite ouvrez [http://localhost:8080](http://localhost:8080) pour accéder à l'application web.
@@ -46,7 +46,7 @@ Les trois services partagent la même propriété `storage.root` (par défaut `.
 
 ```bash
 export STORAGE_ROOT=/chemin/vers/mon/repertoire
-./gradlew :upload-service:bootRun
+mvn -pl upload-service spring-boot:run
 ```
 
 Appliquez la même configuration aux trois services pour conserver un stockage cohérent.
@@ -56,7 +56,7 @@ Appliquez la même configuration aux trois services pour conserver un stockage c
 Lancez toutes les suites :
 
 ```bash
-./gradlew test
+mvn test
 ```
 
 Les tests de chaque microservice se basent sur les contextes Spring Boot et ne nécessitent pas de dépendances externes.
